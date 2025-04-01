@@ -1,9 +1,6 @@
 name: Deploy to VPS
 
-on:
-  push:
-    branches:
-      - develop
+on: [pushs]
 
 jobs:
   build:
