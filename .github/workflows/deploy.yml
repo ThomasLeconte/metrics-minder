@@ -1,6 +1,6 @@
 name: Deploy to VPS
 
-on: [pushs]
+on: [push]
 
 jobs:
   build:
