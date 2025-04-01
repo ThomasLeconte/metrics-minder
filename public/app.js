@@ -3,6 +3,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const memoryCtx = document.getElementById('memory-chart').getContext('2d');
     const diskCtx = document.getElementById('disk-chart').getContext('2d');
     const networkCtx = document.getElementById('network-chart').getContext('2d');
+    const diskPieCtx = document.getElementById('disk-pie-chart').getContext('2d');
 
     const cpuChart = new Chart(cpuCtx, {
         type: 'line',
@@ -87,6 +88,27 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    const diskPieChart = new Chart(diskPieCtx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Used Space', 'Free Space'],
+            datasets: [{
+                data: [0, 100],
+                backgroundColor: ['rgba(255, 99, 132, 0.2)', 'rgba(54, 162, 235, 0.2)'],
+                borderColor: ['rgba(255, 99, 132, 1)', 'rgba(54, 162, 235, 1)'],
+                borderWidth: 1,
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'top',
+                }
+            }
+        }
+    });
+
     async function fetchMetrics() {
         const mainInfos = await fetch('/api/main-infos').then(response => response.json());
         const cpuDetails = await fetch('/api/cpu-infos').then(response => response.json());
@@ -95,25 +117,40 @@ document.addEventListener('DOMContentLoaded', () => {
         const diskDetails = await fetch('/api/disk-infos').then(response => response.json());
 
         // Mettre à jour les graphiques
-        updateChart(cpuChart, cpuDetails.currentLoad);
-        updateChart(memoryChart, (memoryDetails.used / memoryDetails.total) * 100);
+        const cpuUsage = cpuDetails.currentLoad;
+        const memoryUsage = (memoryDetails.used / memoryDetails.total) * 100;
 
         // Calculer l'utilisation totale du disque
         const totalDiskUsage = mainInfos.disks.reduce((acc, disk) => acc + disk.used, 0);
         const totalDiskSize = mainInfos.disks.reduce((acc, disk) => acc + disk.size, 0);
-        updateChart(diskChart, (totalDiskUsage / totalDiskSize) * 100);
+        const diskUsage = (totalDiskUsage / totalDiskSize) * 100;
 
         // Calculer l'utilisation totale du réseau
         const totalNetworkUsage = networkDetails.reduce((acc, network) => acc + network.rx_sec + network.tx_sec, 0);
-        updateChart(networkChart, totalNetworkUsage / 1024);
+        const networkUsage = totalNetworkUsage / 1024;
+
+        updateChart(cpuChart, cpuUsage);
+        updateChart(memoryChart, memoryUsage);
+        updateChart(diskChart, diskUsage);
+        updateChart(networkChart, networkUsage);
+
+        // Mettre à jour le graphique en camembert
+        diskPieChart.data.datasets[0].data = [totalDiskUsage, totalDiskSize - totalDiskUsage];
+        diskPieChart.update();
+
+        // Mettre à jour les titres des cartes
+        document.getElementById('cpu-title').innerText = `Utilisation du CPU: ${cpuUsage.toFixed(2)}%`;
+        document.getElementById('memory-title').innerText = `Utilisation de la RAM: ${memoryUsage.toFixed(2)}%`;
+        document.getElementById('disk-pie-title').innerText = `Capacité du disque: ${diskUsage.toFixed(2)}%`;
+        document.getElementById('disk-title').innerText = `Utilisation du disque: ${diskUsage.toFixed(2)}%`;
+        document.getElementById('network-title').innerText = `Utilisation du réseau: ${networkUsage.toFixed(2)} KB/s`;
 
         // Mettre à jour les informations principales
         document.getElementById('main-info').innerText = `
       OS: ${mainInfos.os.platform}, ${mainInfos.os.distro}, ${mainInfos.os.release}\n
       CPU: ${mainInfos.cpu.manufacturer} ${mainInfos.cpu.brand} ${mainInfos.cpu.speed}GHz\n
-      Memory: ${formatMemory(memoryDetails.total)} total, ${formatMemory(memoryDetails.used)} used\n
-      Disk: ${formatDisk(totalDiskSize)} total, ${formatDisk(totalDiskUsage)} used\n
-      Network: ${formatNetwork(totalNetworkUsage)}
+      Memory: ${formatMemory(memoryDetails.total)} total\n
+      Disk: ${formatDisk(totalDiskSize)} total\n
     `;
     }
 
@@ -140,10 +177,6 @@ document.addEventListener('DOMContentLoaded', () => {
         return (bytes / 1024 / 1024 / 1024).toFixed(2) + ' GB';
     }
 
-    function formatNetwork(bytes) {
-        return (bytes / 1024).toFixed(2) + ' KB';
-    }
-
-    setInterval(fetchMetrics, 5000);
+    setInterval(fetchMetrics, 2500);
     fetchMetrics();
 });

@@ -6,6 +6,12 @@
     <title>Tableau de bord système</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .small-chart {
+            width: 275px !important; /* Ajuste la largeur selon tes besoins */
+            height: 275px !important; /* Ajuste la hauteur selon tes besoins */
+        }
+    </style>
 </head>
 <body class="bg-gray-100 p-6">
 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -16,22 +22,29 @@
     </div>
     <!-- Carte du graphique CPU -->
     <div class="bg-white p-6 rounded-lg shadow-md">
-        <h2 class="text-xl font-semibold mb-4">Utilisation du CPU</h2>
+        <h2 class="text-xl font-semibold mb-4" id="cpu-title">Utilisation du CPU</h2>
         <canvas id="cpu-chart"></canvas>
     </div>
     <!-- Carte du graphique Mémoire -->
     <div class="bg-white p-6 rounded-lg shadow-md">
-        <h2 class="text-xl font-semibold mb-4">Utilisation de la RAM</h2>
+        <h2 class="text-xl font-semibold mb-4" id="memory-title">Utilisation de la RAM</h2>
         <canvas id="memory-chart"></canvas>
+    </div>
+
+    <div class="bg-white p-6 rounded-lg shadow-md">
+        <h2 class="text-xl font-semibold mb-4" id="disk-pie-title">Capacité du disque</h2>
+        <div class="flex justify-center">
+            <canvas id="disk-pie-chart" class="small-chart"></canvas>
+        </div>
     </div>
     <!-- Carte du graphique Disque -->
     <div class="bg-white p-6 rounded-lg shadow-md">
-        <h2 class="text-xl font-semibold mb-4">Utilisation de l'espace disque</h2>
+        <h2 class="text-xl font-semibold mb-4" id="disk-title">Utilisation du disque</h2>
         <canvas id="disk-chart"></canvas>
     </div>
     <!-- Carte du graphique Réseau -->
     <div class="bg-white p-6 rounded-lg shadow-md">
-        <h2 class="text-xl font-semibold mb-4">Utilisation du réseau</h2>
+        <h2 class="text-xl font-semibold mb-4" id="network-title">Utilisation du réseau</h2>
         <canvas id="network-chart"></canvas>
     </div>
 </div>
