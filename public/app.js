@@ -134,7 +134,7 @@ document.addEventListener('DOMContentLoaded', () => {
         updateChart(diskChart, diskUsage);
         updateChart(networkChart, networkUsage);
 
-        // Mettre à jour le graphique en camembert
+        // Mettre à jour le graphique circulaire du disque
         diskPieChart.data.datasets[0].data = [totalDiskUsage, totalDiskSize - totalDiskUsage];
         diskPieChart.update();
 
@@ -177,10 +177,6 @@ document.addEventListener('DOMContentLoaded', () => {
         return (bytes / 1024 / 1024 / 1024).toFixed(2) + ' GB';
     }
 
-    function formatBytesToGiga(bytes) {
-        return (bytes / 1024 / 1024 / 1024).toFixed(2);
-    }
-
-    setInterval(fetchMetrics, 2500);
+    setInterval(fetchMetrics, 5000);
     fetchMetrics();
 });
