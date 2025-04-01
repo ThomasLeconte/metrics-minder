@@ -102,6 +102,14 @@ document.addEventListener('DOMContentLoaded', () => {
         options: {
             responsive: true,
             plugins: {
+                tooltip: {
+                    callbacks: {
+                        label: function(tooltipItem) {
+                            const value = tooltipItem.raw;
+                            return `${tooltipItem.label}: ${formatBytesToGiga(value)} GB`;
+                        }
+                    }
+                },
                 legend: {
                     position: 'top',
                 }
@@ -177,6 +185,10 @@ document.addEventListener('DOMContentLoaded', () => {
         return (bytes / 1024 / 1024 / 1024).toFixed(2) + ' GB';
     }
 
-    setInterval(fetchMetrics, 5000);
+    function formatBytesToGiga(bytes) {
+        return (bytes / 1024 / 1024 / 1024).toFixed(2);
+    }
+
+    setInterval(fetchMetrics, 2500);
     fetchMetrics();
 });
