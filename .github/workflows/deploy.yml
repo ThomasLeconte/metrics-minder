@@ -1,0 +1,42 @@
+name: Deploy to VPS
+
+on:
+  push:
+    branches:
+      - develop
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v1
+
+      - name: Clone project
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SERVER_IP }}
+          username: ${{ secrets.SERVER_USERNAME }}
+          password: ${{ secrets.SERVER_PASSWORD }}
+          port: ${{ secrets.SERVER_PORT }}
+          script: |
+            rm -rf /home/action-deployer/dashboard-metrics
+            mkdir /home/action-deployer/dashboard-metrics
+            cd /home/action-deployer/dashboard-metrics
+            git clone git@github.com:ThomasLeconte/dashboard-metrics.git .
+
+      - name: Install project
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SERVER_IP }}
+          username: ${{ secrets.SERVER_USERNAME }}
+          password: ${{ secrets.SERVER_PASSWORD }}
+          port: ${{ secrets.SERVER_PORT }}
+          script: |
+            cd /home/action-deployer/dashboard-metrics
+            docker stop dashboard-metrics-container || true
+            docker rm dashboard-metrics-container || true
+            docker image rm dashboard-metrics || true            
+            docker build -t dashboard-metrics .
+            docker run -d -p 3100:3000 --network=nginx_proxy --name dashboard-metrics-container dashboard-metrics
