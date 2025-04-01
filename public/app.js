@@ -102,14 +102,6 @@ document.addEventListener('DOMContentLoaded', () => {
         options: {
             responsive: true,
             plugins: {
-                tooltip: {
-                    callbacks: {
-                        label: function(tooltipItem) {
-                            const value = tooltipItem.raw;
-                            return `${tooltipItem.label}: ${formatBytesToGiga(value)} GB`;
-                        }
-                    }
-                },
                 legend: {
                     position: 'top',
                 }
