@@ -4,11 +4,22 @@ const si = require("systeminformation");
 const app = express();
 const port = 3000;
 
-app.use(express.static('public'));
+let disksIOCompatibility = {
+    fs: false,
+    disksIO: false
+}
+
+let cacheInfos = {
+    osInfos: null,
+    cpuInfos: null,
+    memoryInfos: null,
+    disksInfos: null,
+    networkInfos: null
+}
 
 app.get('/api/main-infos', async (req, res) => {
     res.json({
-        os: getOSInfos(),
+        os: await getOSInfos(),
         cpu: await getCPUInfos(),
         memory: await getMemoryInfos(),
         disks: await getDisksInfos(),
@@ -29,34 +40,39 @@ app.get('/api/network-infos', async (req, res) => {
 });
 
 app.get('/api/disk-infos', async (req, res) => {
-    console.log(await si.fsStats(), await si.disksIO())
     res.json(await getDiskDetails());
 });
 
 function getOSInfos() {
-    return {
+    if(cacheInfos.osInfos) return Promise.resolve(cacheInfos.osInfos);
+    cacheInfos.osInfos = {
         platform: os.platform(),
         distro: os.type(),
         release: os.release(),
         hostname: os.hostname(),
         arch: os.arch()
     };
+
+    return Promise.resolve(cacheInfos.osInfos);
 }
 
 function getCPUInfos() {
+    if(cacheInfos.cpuInfos) return Promise.resolve(cacheInfos.cpuInfos);
     return si.cpu().then((cpu) => {
-        return {
+        cacheInfos.cpuInfos = {
             manufacturer: cpu.manufacturer,
             brand: cpu.brand,
             speed: cpu.speed
         };
+
+        return cacheInfos.cpuInfos;
     });
 }
 
 function getDisksInfos() {
+    if(cacheInfos.disksInfos) return Promise.resolve(cacheInfos.disksInfos);
     return si.fsSize().then((disks) => {
-        if(!disks) return null;
-        return disks.map((disk) => {
+        cacheInfos.disksInfos = disks.map((disk) => {
             return {
                 fs: disk.fs,
                 size: disk.size,
@@ -64,12 +80,15 @@ function getDisksInfos() {
                 available: disk.available
             }
         });
+
+        return cacheInfos.disksInfos;
     });
 }
 
 function getMemoryInfos() {
+    if(cacheInfos.memoryInfos) return Promise.resolve(cacheInfos.memoryInfos);
     return si.memLayout().then((memory) => {
-        return memory.map((mem) => {
+        cacheInfos.memoryInfos = memory.map((mem) => {
             return {
                 size: mem.size,
                 bank: mem.bank,
@@ -78,12 +97,15 @@ function getMemoryInfos() {
                 manufacturer: mem.manufacturer
             }
         });
+
+        return cacheInfos.memoryInfos;
     });
 }
 
 function getNetworkInfos() {
+    if(cacheInfos.networkInfos) return Promise.resolve(cacheInfos.networkInfos);
     return si.networkInterfaces().then((network) => {
-        return network.map((iface) => {
+        cacheInfos.networkInfos = network.map((iface) => {
             return {
                 iface: iface.iface,
                 ip4: iface.ip4,
@@ -93,6 +115,8 @@ function getNetworkInfos() {
                 virtual: iface.virtual
             }
         });
+
+        return cacheInfos.networkInfos;
     });
 }
 
@@ -128,46 +152,39 @@ function getNetworkDetails() {
 }
 
 function getDiskDetails() {
-    return si.fsStats().then((disk) => {
-        if(!disk) return { rx_sec: null, wx_sec: null }
+    if (!disksIOCompatibility.fs && !disksIOCompatibility.disksIO) return Promise.resolve({rx_sec: null, wx_sec: null})
+
+    else if (disksIOCompatibility.fs && !disksIOCompatibility.disksIO) {
+        return si.fsStats().then((disk) => {
+            return {
+                rx_sec: disk.rx_sec,
+                wx_sec: disk.wx_sec
+            }
+        });
+    } else return si.disksIO().then((disk) => {
         return {
-            rx_sec: disk.rx_sec,
-            wx_sec: disk.wx_sec
+            rx_sec: disk.rIO_sec,
+            wx_sec: disk.wIO_sec
         }
     });
 }
 
-app.listen(port, () => {
+app.listen(port, async () => {
     console.log(`Serveur en écoute sur le port ${port}`);
 
-    Promise.all([si.osInfo(), si.cpu()])
-        .then(([osInfos, cpuInfos]) => {
-            console.log(`[OS] Platform: ${osInfos.platform}, Distro: ${osInfos.distro}, Release: ${osInfos.release}`)
-            console.log(`[CPU] ${cpuInfos.manufacturer} ${cpuInfos.brand} ${cpuInfos.speed}GHz`)
-        }).finally(() => {
+    await Promise.all([si.fsStats(), si.disksIO()]) //first call always null
 
-        const formatGo = (bytes) => {
-            return bytes && (bytes / 1024 / 1024 / 1024).toFixed(2)
-        }
-
-        const formatMo = (bytes) => {
-            return bytes && (bytes / 1024 / 1024).toFixed(2)
-        }
-
-        // setInterval(() => {
-        //     Promise.all([si.currentLoad(), si.mem(), si.networkStats(), si.fsSize(), si.fsStats()])
-        //         .then(([load, memory, network, disks, diskStats]) => {
-        //             console.log(`[CPU] Load: ${(load.currentLoad * 10).toFixed(2)}%`)
-        //
-        //             console.log(`[MEMORY] Total: ${formatGo(memory.total)}Go, Free: ${formatGo(memory.free)}Go, Used: ${formatGo(memory.used)}Go`)
-        //             // console.log(`[DISK] Total: ${disk.total / 1024 / 1024 / 1024}, Free: ${disk.free / 1024 / 1024 / 1024}, Used: ${disk.used / 1024 / 1024 / 1024}`)
-        //             disks.forEach((disk) => {
-        //                 console.log(`[DISK] ${disk.fs} Total: ${formatGo(disk.size)}Go, Free: ${formatGo(disk.available)}, Used: ${disk.use}%`)
-        //             })
-        //             console.log(`[STATS NETWORK] Received: ${formatMo(network[0].rx_sec)} Mb/s, Transmitted: ${formatMo(network[0].tx_sec)} Mb/s`)
-        //             if (diskStats) console.log(`[STATS DISK] Read: ${formatMo(diskStats.tx_sec)} Mb/s, Write: ${formatMo(diskStats.wx_sec)} Mb/s`)
-        //             console.log("\n\n")
-        //         })
-        // }, 1000)
-    })
+    setTimeout(() => {
+        Promise.all([si.fsStats(), si.disksIO()])
+            .then(([fsStats, disksIO]) => {
+                disksIOCompatibility = {
+                    fs: !!fsStats,
+                    disksIO: !!disksIO
+                }
+                console.log(disksIOCompatibility)
+            }).finally(() => {
+                console.log("Client disponible sur http://localhost:3000")
+                app.use(express.static('public'));
+            });
+    }, 1000);
 });
