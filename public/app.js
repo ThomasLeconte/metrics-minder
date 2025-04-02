@@ -4,6 +4,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const diskCtx = document.getElementById('disk-chart').getContext('2d');
     const networkCtx = document.getElementById('network-chart').getContext('2d');
     const diskPieCtx = document.getElementById('disk-pie-chart').getContext('2d');
+    const refreshRateSelect = document.getElementById('refresh-rate');
 
     const cpuChart = new Chart(cpuCtx, {
         type: 'line',
@@ -51,18 +52,26 @@ document.addEventListener('DOMContentLoaded', () => {
         type: 'line',
         data: {
             labels: [],
-            datasets: [{
-                label: 'Disk Usage (%)',
-                data: [],
-                borderColor: 'rgba(255, 159, 64, 1)',
-                fill: false,
-            }]
+            datasets: [
+                {
+                    label: 'Disk Read (MB/s)',
+                    data: [],
+                    borderColor: 'rgb(29,161,56)',
+                    fill: false,
+                },
+                {
+                    label: 'Disk Write (MB/s)',
+                    data: [],
+                    borderColor: 'rgb(255,120,34)',
+                    fill: false,
+                }
+            ]
         },
         options: {
             scales: {
                 y: {
                     beginAtZero: true,
-                    max: 100
+                    max: 10
                 }
             }
         }
@@ -125,6 +134,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    let refreshInterval = 5000;
+    let fetchMetricsInterval;
+
     async function fetchMetrics() {
         const mainInfos = await fetch('/api/main-infos').then(response => response.json());
         const cpuDetails = await fetch('/api/cpu-infos').then(response => response.json());
@@ -144,7 +156,12 @@ document.addEventListener('DOMContentLoaded', () => {
         diskPieChart.data.datasets[0].data = [totalDiskUsage, totalDiskSize - totalDiskUsage];
 
         // Calculer l'utilisation totale du disque
-        const diskUsage = diskDetails.rx_sec || 0 + diskDetails.tx_sec || 0;
+        const rx = diskDetails.rx_sec || (diskDetails.tx_sec && diskDetails.rx_sec ? diskDetails.tx_sec - diskDetails.rx_sec : 0);
+        const wx = diskDetails.wx_sec || (diskDetails.tx_sec && diskDetails.rx_sec ? diskDetails.tx_sec - diskDetails.rx_sec : 0);
+        const tx = diskDetails.tx_sec || (diskDetails.rx_sec && diskDetails.wx_sec ? diskDetails.rx_sec + diskDetails.wx_sec : 0);
+        const diskReadUsage = formatBytesToMega(rx);
+        const diskWriteUsage = formatBytesToMega(wx) || 0;
+        const diskTotalUsage = formatBytesToMega(tx) || 0;
 
         // Calculer l'utilisation totale du réseau
         const totalNetworkRead = networkDetails.reduce((acc, network) => acc + network.rx_sec, 0) / 1024;
@@ -152,7 +169,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         updateChart(cpuChart, cpuUsage);
         updateChart(memoryChart, memoryUsage);
-        updateChart(diskChart, diskUsage);
+        updateDiskChart(diskChart, diskReadUsage, diskWriteUsage);
         updateNetworkChart(networkChart, totalNetworkRead, totalNetworkWrite);
 
         diskPieChart.update();
@@ -161,7 +178,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('cpu-title').innerText = `Utilisation du CPU: ${cpuUsage.toFixed(2)}%`;
         document.getElementById('memory-title').innerText = `Utilisation de la RAM: ${formatBytesToGiga(memoryDetails.used)}Go (${memoryUsage.toFixed(2)}%)`;
         document.getElementById('disk-pie-title').innerText = `Capacité du disque: ${diskUsagePercentage.toFixed(2)}%`;
-        document.getElementById('disk-title').innerText = `Utilisation du disque: ${diskUsage.toFixed(2)}%`;
+        document.getElementById('disk-title').innerText = `Utilisation du disque: ${diskTotalUsage} Mb/s`;
         document.getElementById('network-title').innerText = `Utilisation du réseau: ${(totalNetworkRead + totalNetworkWrite).toFixed(2)} KB/s`;
 
         // Mettre à jour les informations principales
@@ -206,6 +223,24 @@ document.addEventListener('DOMContentLoaded', () => {
         chart.update();
     }
 
+    function updateDiskChart(chart, readValue, writeValue) {
+        const labels = chart.data.labels;
+        const readData = chart.data.datasets[0].data;
+        const writeData = chart.data.datasets[1].data;
+
+        if (labels.length >= 10) {
+            labels.shift();
+            readData.shift();
+            writeData.shift();
+        }
+
+        labels.push(new Date().toLocaleTimeString());
+        readData.push(readValue);
+        writeData.push(writeValue);
+
+        chart.update();
+    }
+
     function formatMemory(bytes) {
         return (bytes / 1e9).toFixed(2) + ' Go';
     }
@@ -218,6 +253,21 @@ document.addEventListener('DOMContentLoaded', () => {
         return (bytes / 1e9).toFixed(2);
     }
 
-    setInterval(fetchMetrics, 5000);
-    fetchMetrics();
+    function formatBytesToMega(bytes) {
+        return (bytes / 1e6).toFixed(2);
+    }
+
+    function startFetchingMetrics() {
+        clearInterval(fetchMetricsInterval);
+        fetchMetricsInterval = setInterval(fetchMetrics, refreshInterval);
+        fetchMetrics(); // Appel initial pour éviter le délai au démarrage
+    }
+
+    refreshRateSelect.addEventListener('change', (event) => {
+        refreshInterval = parseInt(event.target.value, 10);
+        startFetchingMetrics();
+    });
+
+    // Démarrer la récupération des métriques avec l'intervalle par défaut
+    startFetchingMetrics();
 });

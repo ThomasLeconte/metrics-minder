@@ -17,6 +17,18 @@
 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
     <!-- Carte d'informations principales -->
     <div class="bg-white p-6 rounded-lg shadow-md">
+        <div class="flex justify-between items-center">
+            <h2 class="text-xl font-semibold mb-4">Tableau de bord système</h2>
+            <span>
+                <label for="refresh-rate" class="block text-xl font-semibold mb-4">Raffraichissement</label>
+                <select id="refresh-rate" class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                    <option value="1000">1 seconde</option>
+                    <option value="2000">2 secondes</option>
+                    <option value="5000" selected>5 secondes</option>
+                    <option value="10000">10 secondes</option>
+                </select>
+            </span>
+        </div>
         <h2 class="text-xl font-semibold mb-4">Informations principales</h2>
         <p id="main-info">Chargement...</p>
     </div>

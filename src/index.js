@@ -158,23 +158,33 @@ function getDiskDetails() {
         return si.fsStats().then((disk) => {
             return {
                 rx_sec: disk.rx_sec,
-                wx_sec: disk.wx_sec
+                wx_sec: disk.wx_sec,
+                tx_sec: disk.tx_sec
             }
         });
-    } else return si.disksIO().then((disk) => {
-        return {
-            rx_sec: disk.rIO_sec,
-            wx_sec: disk.wIO_sec
-        }
-    });
+    } else if (!disksIOCompatibility.fs && disksIOCompatibility.disksIO) {
+        return si.disksIO().then((disk) => {
+            return {
+                rx_sec: disk.rIO_sec,
+                wx_sec: disk.wIO_sec,
+                tx_sec: disk.tIO_sec
+            }
+        });
+    } else {
+        return si.fsStats().then((fs) => {
+            return {
+                rx_sec: fs.rx_sec,
+                wx_sec: fs.wx_sec,
+                tx_sec: fs.tx_sec
+            }
+        });
+    }
 }
 
 app.listen(port, async () => {
     console.log(`Serveur en écoute sur le port ${port}`);
 
     await Promise.all([si.fsStats(), si.disksIO()]) //first call always null
-
-    await si.fsSize().then((r) => console.log(r));
 
     setTimeout(() => {
         Promise.all([si.fsStats(), si.disksIO()])
