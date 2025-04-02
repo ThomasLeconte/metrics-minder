@@ -72,7 +72,7 @@ function getCPUInfos() {
 function getDisksInfos() {
     if(cacheInfos.disksInfos) return Promise.resolve(cacheInfos.disksInfos);
     return si.fsSize().then((disks) => {
-        cacheInfos.disksInfos = disks.map((disk) => {
+        cacheInfos.disksInfos = disks.filter(d => d.rw).map((disk) => {
             return {
                 fs: disk.fs,
                 size: disk.size,
@@ -173,6 +173,8 @@ app.listen(port, async () => {
     console.log(`Serveur en écoute sur le port ${port}`);
 
     await Promise.all([si.fsStats(), si.disksIO()]) //first call always null
+
+    await si.fsSize().then((r) => console.log(r));
 
     setTimeout(() => {
         Promise.all([si.fsStats(), si.disksIO()])

@@ -159,7 +159,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Mettre à jour les titres des cartes
         document.getElementById('cpu-title').innerText = `Utilisation du CPU: ${cpuUsage.toFixed(2)}%`;
-        document.getElementById('memory-title').innerText = `Utilisation de la RAM: ${memoryUsage.toFixed(2)}%`;
+        document.getElementById('memory-title').innerText = `Utilisation de la RAM: ${formatBytesToGiga(memoryDetails.used)}Go (${memoryUsage.toFixed(2)}%)`;
         document.getElementById('disk-pie-title').innerText = `Capacité du disque: ${diskUsagePercentage.toFixed(2)}%`;
         document.getElementById('disk-title').innerText = `Utilisation du disque: ${diskUsage.toFixed(2)}%`;
         document.getElementById('network-title').innerText = `Utilisation du réseau: ${(totalNetworkRead + totalNetworkWrite).toFixed(2)} KB/s`;
@@ -207,15 +207,15 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function formatMemory(bytes) {
-        return (bytes / 1024 / 1024 / 1024).toFixed(2) + ' GB';
+        return (bytes / 1e9).toFixed(2) + ' Go';
     }
 
     function formatDisk(bytes) {
-        return (bytes / 1024 / 1024 / 1024).toFixed(2) + ' GB';
+        return (bytes / 1e9).toFixed(2) + ' GB';
     }
 
     function formatBytesToGiga(bytes) {
-        return (bytes / 1024 / 1024 / 1024).toFixed(2);
+        return (bytes / 1e9).toFixed(2);
     }
 
     setInterval(fetchMetrics, 5000);
