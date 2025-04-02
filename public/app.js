@@ -72,12 +72,20 @@ document.addEventListener('DOMContentLoaded', () => {
         type: 'line',
         data: {
             labels: [],
-            datasets: [{
-                label: 'Network Usage (KB)',
-                data: [],
-                borderColor: 'rgba(255, 99, 132, 1)',
-                fill: false,
-            }]
+            datasets: [
+                {
+                    label: 'Network Read (KB/s)',
+                    data: [],
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    fill: false,
+                },
+                {
+                    label: 'Network Write (KB/s)',
+                    data: [],
+                    borderColor: 'rgba(255, 206, 86, 1)',
+                    fill: false,
+                }
+            ]
         },
         options: {
             scales: {
@@ -139,13 +147,13 @@ document.addEventListener('DOMContentLoaded', () => {
         const diskUsage = diskDetails.rx_sec || 0 + diskDetails.tx_sec || 0;
 
         // Calculer l'utilisation totale du réseau
-        const totalNetworkUsage = networkDetails.reduce((acc, network) => acc + network.rx_sec + network.tx_sec, 0);
-        const networkUsage = totalNetworkUsage / 1024;
+        const totalNetworkRead = networkDetails.reduce((acc, network) => acc + network.rx_sec, 0) / 1024;
+        const totalNetworkWrite = networkDetails.reduce((acc, network) => acc + network.tx_sec, 0) / 1024;
 
         updateChart(cpuChart, cpuUsage);
         updateChart(memoryChart, memoryUsage);
         updateChart(diskChart, diskUsage);
-        updateChart(networkChart, networkUsage);
+        updateNetworkChart(networkChart, totalNetworkRead, totalNetworkWrite);
 
         diskPieChart.update();
 
@@ -154,7 +162,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('memory-title').innerText = `Utilisation de la RAM: ${memoryUsage.toFixed(2)}%`;
         document.getElementById('disk-pie-title').innerText = `Capacité du disque: ${diskUsagePercentage.toFixed(2)}%`;
         document.getElementById('disk-title').innerText = `Utilisation du disque: ${diskUsage.toFixed(2)}%`;
-        document.getElementById('network-title').innerText = `Utilisation du réseau: ${networkUsage.toFixed(2)} KB/s`;
+        document.getElementById('network-title').innerText = `Utilisation du réseau: ${(totalNetworkRead + totalNetworkWrite).toFixed(2)} KB/s`;
 
         // Mettre à jour les informations principales
         document.getElementById('main-info').innerText = `
@@ -176,6 +184,24 @@ document.addEventListener('DOMContentLoaded', () => {
 
         labels.push(new Date().toLocaleTimeString());
         data.push(value);
+
+        chart.update();
+    }
+
+    function updateNetworkChart(chart, readValue, writeValue) {
+        const labels = chart.data.labels;
+        const readData = chart.data.datasets[0].data;
+        const writeData = chart.data.datasets[1].data;
+
+        if (labels.length >= 10) {
+            labels.shift();
+            readData.shift();
+            writeData.shift();
+        }
+
+        labels.push(new Date().toLocaleTimeString());
+        readData.push(readValue);
+        writeData.push(writeValue);
 
         chart.update();
     }
