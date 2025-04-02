@@ -8,32 +8,21 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v1
+    - name: Checkout code
+      uses: actions/checkout@v2
 
-      - name: Clone project
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.SERVER_IP }}
-          username: ${{ secrets.SERVER_USERNAME }}
-          password: ${{ secrets.SERVER_PASSWORD }}
-          port: ${{ secrets.SERVER_PORT }}
-          script: |
-            rm -rf /home/action-deployer/dashboard-metrics
-            mkdir /home/action-deployer/dashboard-metrics
-            cd /home/action-deployer/dashboard-metrics
-            git clone git@github.com:ThomasLeconte/dashboard-metrics.git .
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v1
 
-      - name: Install project
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.SERVER_IP }}
-          username: ${{ secrets.SERVER_USERNAME }}
-          password: ${{ secrets.SERVER_PASSWORD }}
-          port: ${{ secrets.SERVER_PORT }}
-          script: |
-            cd /home/action-deployer/dashboard-metrics
-            docker stop dashboard-metrics-container || true
-            docker rm dashboard-metrics-container || true
-            docker image rm dashboard-metrics || true            
-            docker build -t dashboard-metrics .
-            docker run -d -p 3100:3000 --network=nginx_proxy --name dashboard-metrics-container dashboard-metrics
+    - name: Login to Docker Hub
+      uses: docker/login-action@v2
+      with:
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+
+    - name: Build and push
+      uses: docker/build-push-action@v2
+      with:
+        context: .
+        push: true
+        tags: thomasleconte/metricsminder:latest
