@@ -29,6 +29,7 @@ app.get('/api/network-infos', async (req, res) => {
 });
 
 app.get('/api/disk-infos', async (req, res) => {
+    console.log(await si.fsStats(), await si.disksIO())
     res.json(await getDiskDetails());
 });
 
