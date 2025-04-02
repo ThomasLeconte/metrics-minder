@@ -128,10 +128,15 @@ document.addEventListener('DOMContentLoaded', () => {
         const cpuUsage = cpuDetails.currentLoad;
         const memoryUsage = (memoryDetails.used / memoryDetails.total) * 100;
 
-        // Calculer l'utilisation totale du disque
+        // Calculer la capacité du disque
         const totalDiskUsage = mainInfos.disks.reduce((acc, disk) => acc + disk.used, 0);
         const totalDiskSize = mainInfos.disks.reduce((acc, disk) => acc + disk.size, 0);
-        const diskUsage = (totalDiskUsage / totalDiskSize) * 100;
+        // Mettre à jour le graphique circulaire du disque
+        const diskUsagePercentage = (totalDiskUsage / totalDiskSize) * 100;
+        diskPieChart.data.datasets[0].data = [totalDiskUsage, totalDiskSize - totalDiskUsage];
+
+        // Calculer l'utilisation totale du disque
+        const diskUsage = diskDetails.rx_sec || 0 + diskDetails.tx_sec || 0;
 
         // Calculer l'utilisation totale du réseau
         const totalNetworkUsage = networkDetails.reduce((acc, network) => acc + network.rx_sec + network.tx_sec, 0);
@@ -142,14 +147,12 @@ document.addEventListener('DOMContentLoaded', () => {
         updateChart(diskChart, diskUsage);
         updateChart(networkChart, networkUsage);
 
-        // Mettre à jour le graphique circulaire du disque
-        diskPieChart.data.datasets[0].data = [totalDiskUsage, totalDiskSize - totalDiskUsage];
         diskPieChart.update();
 
         // Mettre à jour les titres des cartes
         document.getElementById('cpu-title').innerText = `Utilisation du CPU: ${cpuUsage.toFixed(2)}%`;
         document.getElementById('memory-title').innerText = `Utilisation de la RAM: ${memoryUsage.toFixed(2)}%`;
-        document.getElementById('disk-pie-title').innerText = `Capacité du disque: ${diskUsage.toFixed(2)}%`;
+        document.getElementById('disk-pie-title').innerText = `Capacité du disque: ${diskUsagePercentage.toFixed(2)}%`;
         document.getElementById('disk-title').innerText = `Utilisation du disque: ${diskUsage.toFixed(2)}%`;
         document.getElementById('network-title').innerText = `Utilisation du réseau: ${networkUsage.toFixed(2)} KB/s`;
 
@@ -189,6 +192,6 @@ document.addEventListener('DOMContentLoaded', () => {
         return (bytes / 1024 / 1024 / 1024).toFixed(2);
     }
 
-    setInterval(fetchMetrics, 2500);
+    setInterval(fetchMetrics, 5000);
     fetchMetrics();
 });

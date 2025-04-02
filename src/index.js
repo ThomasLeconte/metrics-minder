@@ -54,6 +54,7 @@ function getCPUInfos() {
 
 function getDisksInfos() {
     return si.fsSize().then((disks) => {
+        if(!disks) return null;
         return disks.map((disk) => {
             return {
                 fs: disk.fs,
@@ -127,6 +128,7 @@ function getNetworkDetails() {
 
 function getDiskDetails() {
     return si.fsStats().then((disk) => {
+        if(!disk) return { rx_sec: null, wx_sec: null }
         return {
             rx_sec: disk.rx_sec,
             wx_sec: disk.wx_sec
