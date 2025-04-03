@@ -74,6 +74,7 @@ function getCPUInfos() {
 function getDisksInfos() {
     if(cacheInfos.disksInfos) return Promise.resolve(cacheInfos.disksInfos);
     return Promise.all([si.blockDevices(), si.fsSize()]).then(([blockDevices, disks]) => {
+        console.log(blockDevices, disks)
         cacheInfos.disksInfos = disks
             .filter(d => d.rw) //Filter non-virtual disks (for VPS) or read-only disks
             .filter(d => blockDevices.find(b => b.mount === d.fs)) // Make sure the disk is mounted
