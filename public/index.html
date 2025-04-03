@@ -6,6 +6,7 @@
     <title>Tableau de bord système</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://unpkg.com/boxicons@2.1.4/dist/boxicons.js"></script>
     <style>
         .small-chart {
             width: 275px !important; /* Ajuste la largeur selon tes besoins */
@@ -17,20 +18,56 @@
 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
     <!-- Carte d'informations principales -->
     <div class="bg-white p-6 rounded-lg shadow-md">
-        <div class="flex justify-between items-center">
-            <h2 class="text-xl font-semibold mb-4">Tableau de bord système</h2>
-            <span>
-                <label for="refresh-rate" class="block text-xl font-semibold mb-4">Raffraichissement</label>
-                <select id="refresh-rate" class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-                    <option value="1000">1 seconde</option>
-                    <option value="2000">2 secondes</option>
-                    <option value="5000" selected>5 secondes</option>
-                    <option value="10000">10 secondes</option>
-                </select>
-            </span>
+        <div class="flex flex-col justify-between items-center">
+            <div>
+                <div class="flex justify-between items-center mb-4">
+                    <span class="flex items-center space-x-2">
+                        <h2 class="text-xl font-semibold mb-2">MetricsMinder</h2>
+                        <a href="https://github.com/ThomasLeconte/metricsminder" target="_blank" class="text-gray-500 hover:text-gray-700">
+                            <box-icon type='logo' name='github'></box-icon>
+                        </a>
+                    </span>
+                    <div>
+                        <label for="refresh-rate" class="sr-only">Taux de rafraîchissement</label>
+                        <select id="refresh-rate" class="py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                            <option value="1000">1 seconde</option>
+                            <option value="2000">2 secondes</option>
+                            <option value="5000" selected>5 secondes</option>
+                            <option value="10000">10 secondes</option>
+                        </select>
+                    </div>
+                </div>
+                <table class="w-full bg-gray-50 rounded-lg overflow-hidden mb-4">
+                    <thead class="bg-gray-200">
+                    <tr>
+                        <th class="py-2 px-4 text-left">Caractéristique</th>
+                        <th class="py-2 px-4 text-left">Valeur</th>
+                    </tr>
+                    </thead>
+                    <tbody id="main-info">
+                    <tr>
+                        <td class="py-2 px-4">OS</td>
+                        <td class="py-2 px-4" id="os-info">Chargement...</td>
+                    </tr>
+                    <tr>
+                        <td class="py-2 px-4">CPU</td>
+                        <td class="py-2 px-4" id="cpu-info">Chargement...</td>
+                    </tr>
+                    <tr>
+                        <td class="py-2 px-4">Mémoire totale</td>
+                        <td class="py-2 px-4" id="memory-info">Chargement...</td>
+                    </tr>
+                    <tr>
+                        <td class="py-2 px-4">Espace disque total</td>
+                        <td class="py-2 px-4" id="disk-info">Chargement...</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div>
+                <p>Made with ❤️ by <a href="https://github.com/ThomasLeconte" target="_blank" class="text-blue-500 hover:underline">Thomas LECONTE</a></p>
+            </div>
         </div>
-        <h2 class="text-xl font-semibold mb-4">Informations principales</h2>
-        <p id="main-info">Chargement...</p>
     </div>
     <!-- Carte du graphique CPU -->
     <div class="bg-white p-6 rounded-lg shadow-md">
@@ -44,7 +81,7 @@
     </div>
 
     <div class="bg-white p-6 rounded-lg shadow-md">
-        <h2 class="text-xl font-semibold mb-4" id="disk-pie-title">Capacité du disque</h2>
+        <h2 class="text-xl font-semibold mb-4" id="disk-pie-title">Capacité de stockage</h2>
         <div class="flex justify-center">
             <canvas id="disk-pie-chart" class="small-chart"></canvas>
         </div>

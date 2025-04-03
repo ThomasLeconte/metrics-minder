@@ -1,7 +1,9 @@
 const express = require('express');
 const os = require('os');
 const si = require("systeminformation");
+const {blockDevices} = require("systeminformation");
 const app = express();
+const cors = require('cors');
 const port = 3000;
 
 let disksIOCompatibility = {
@@ -71,15 +73,19 @@ function getCPUInfos() {
 
 function getDisksInfos() {
     if(cacheInfos.disksInfos) return Promise.resolve(cacheInfos.disksInfos);
-    return si.fsSize().then((disks) => {
-        cacheInfos.disksInfos = disks.filter(d => d.rw).map((disk) => {
-            return {
-                fs: disk.fs,
-                size: disk.size,
-                used: disk.used,
-                available: disk.available
-            }
-        });
+    return Promise.all([si.blockDevices(), si.fsSize()]).then(([blockDevices, disks]) => {
+        cacheInfos.disksInfos = disks
+            .filter(d => d.rw) //Filter non-virtual disks (for VPS) or read-only disks
+            .filter(d => blockDevices.find(b => b.mount === d.fs)) // Make sure the disk is mounted
+            .filter(d => blockDevices.find(b => b.mount === d.fs && b.physical !== "Network")) //Filter network disks
+            .map((disk) => {
+                return {
+                    fs: disk.fs,
+                    size: disk.size,
+                    used: disk.used,
+                    available: disk.available
+                }
+            });
 
         return cacheInfos.disksInfos;
     });
@@ -196,6 +202,7 @@ app.listen(port, async () => {
                 console.log(disksIOCompatibility)
             }).finally(() => {
                 console.log("Client disponible sur http://localhost:3000")
+                app.use(cors())
                 app.use(express.static('public'));
             });
     }, 1000);

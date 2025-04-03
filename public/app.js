@@ -177,17 +177,15 @@ document.addEventListener('DOMContentLoaded', () => {
         // Mettre à jour les titres des cartes
         document.getElementById('cpu-title').innerText = `Utilisation du CPU: ${cpuUsage.toFixed(2)}%`;
         document.getElementById('memory-title').innerText = `Utilisation de la RAM: ${formatBytesToGiga(memoryDetails.used)}Go (${memoryUsage.toFixed(2)}%)`;
-        document.getElementById('disk-pie-title').innerText = `Capacité du disque: ${diskUsagePercentage.toFixed(2)}%`;
+        document.getElementById('disk-pie-title').innerText = `Capacité de stockage: ${diskUsagePercentage.toFixed(2)}%`;
         document.getElementById('disk-title').innerText = `Utilisation du disque: ${diskTotalUsage} Mb/s`;
         document.getElementById('network-title').innerText = `Utilisation du réseau: ${(totalNetworkRead + totalNetworkWrite).toFixed(2)} KB/s`;
 
-        // Mettre à jour les informations principales
-        document.getElementById('main-info').innerText = `
-      OS: ${mainInfos.os.platform}, ${mainInfos.os.distro}, ${mainInfos.os.release}\n
-      CPU: ${mainInfos.cpu.manufacturer} ${mainInfos.cpu.brand} ${mainInfos.cpu.speed}GHz\n
-      Memory: ${formatMemory(memoryDetails.total)} total\n
-      Disk: ${formatDisk(totalDiskSize)} total\n
-    `;
+        // Mettre à jour les informations principales dans le tableau
+        document.getElementById('os-info').innerText = `${mainInfos.os.platform}, ${mainInfos.os.distro}, ${mainInfos.os.release}`;
+        document.getElementById('cpu-info').innerText = `${mainInfos.cpu.manufacturer} ${mainInfos.cpu.brand} ${mainInfos.cpu.speed}GHz`;
+        document.getElementById('memory-info').innerText = `${formatMemory(memoryDetails.total)}`;
+        document.getElementById('disk-info').innerText = `${formatDisk(totalDiskSize)}`;
     }
 
     function updateChart(chart, value) {
