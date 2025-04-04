@@ -1,6 +1,6 @@
 <template>
   <CustomCard :title="title">
-    <Chart type="pie" :data="chartData" :options="chartOptions" :height="200" :width="200" />
+    <Chart type="pie" :data="chartData" :options="chartOptions" :height="150" :width="150" />
   </CustomCard>
 </template>
 <script lang="ts">
@@ -30,7 +30,9 @@ export default defineComponent({
       }]
     })
     const chartOptions = ref({
+      animation: false,
       responsive: true,
+      maintainAspectRatio: false,
       plugins: {
         tooltip: {
           callbacks: {

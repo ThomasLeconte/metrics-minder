@@ -18,6 +18,10 @@ export class DashboardApi {
         return instance.get("/api/disk-capacity-infos").then((response => response.data));
     }
 
+    static getDiskMetrics() {
+        return instance.get("/api/disk-infos").then((response => response.data));
+    }
+
     static getNetworksMetrics() {
         return instance.get("/api/network-infos").then((response => response.data));
     }

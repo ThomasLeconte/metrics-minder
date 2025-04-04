@@ -8,7 +8,7 @@
           <Select v-model="refreshRate" :options="refreshOptions" optionLabel="name" optionValue="value" placeholder="Select refresh rate" size="small" />
         </div>
         <div>
-<!--          <p class="text-lg">Made with ❤️ by <a href="https://github.com/ThomasLeconte" target="_blank" class="text-blue-500 hover:underline">Thomas LECONTE</a></p>-->
+          <p class="text-lg">Made with ❤️ by <a href="https://github.com/ThomasLeconte" target="_blank" class="text-blue-500 hover:underline">Thomas LECONTE</a></p>
         </div>
       </div>
     </template>

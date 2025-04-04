@@ -8,7 +8,7 @@ import CustomCard from "~/pages/dashboard/components/custom-card.vue";
 import {DashboardApi} from "~/api/dashboard-api";
 
 export default defineComponent({
-  name: "NetworkUsage",
+  name: "DiskUsage",
   components: {CustomCard},
   props: {
     refreshRate: {
@@ -18,21 +18,21 @@ export default defineComponent({
   },
   setup(props) {
     const interval = ref(-1);
-    const title = ref('Network usage');
+    const title = ref('Disk usage');
 
     const chartData = reactive({
       labels: [] as any[],
       datasets: [
         {
-          label: 'Network Read (KB/s)',
+          label: 'Disk Read (MB/s)',
           data: [] as any[],
-          borderColor: 'rgba(54, 162, 235, 1)',
+          borderColor: 'rgb(29,161,56)',
           fill: false,
         },
         {
-          label: 'Network Write (KB/s)',
+          label: 'Disk Write (MB/s)',
           data: [] as any[],
-          borderColor: 'rgba(255, 206, 86, 1)',
+          borderColor: 'rgb(255,120,34)',
           fill: false,
         }
       ]
@@ -72,15 +72,19 @@ export default defineComponent({
     })
 
     function updateMetrics() {
-      DashboardApi.getNetworksMetrics()
-          .then((networkDetails: any[]) => {
-            const totalNetworkRead = networkDetails.reduce((acc, network) => acc + network.rx_sec, 0) / 1024;
-            const totalNetworkWrite = networkDetails.reduce((acc, network) => acc + network.tx_sec, 0) / 1024;
+      DashboardApi.getDiskMetrics()
+          .then((diskDetails: any) => {
+            const rx = diskDetails.rx_sec || (diskDetails.tx_sec && diskDetails.rx_sec ? diskDetails.tx_sec - diskDetails.rx_sec : 0);
+            const wx = diskDetails.wx_sec || (diskDetails.tx_sec && diskDetails.rx_sec ? diskDetails.tx_sec - diskDetails.rx_sec : 0);
+            const tx = diskDetails.tx_sec || (diskDetails.rx_sec && diskDetails.wx_sec ? diskDetails.rx_sec + diskDetails.wx_sec : 0);
+            const diskReadUsage = formatBytesToMega(rx);
+            const diskWriteUsage = formatBytesToMega(wx) || 0;
+            const diskTotalUsage = formatBytesToMega(tx) || 0;
 
-            title.value = `Network usage (${(totalNetworkRead + totalNetworkWrite).toFixed(2)} MB/s)`;
+            title.value = `Disk usage (${(diskTotalUsage)} MB/s)`;
             chartData.labels.push(new Date().toLocaleTimeString());
-            chartData.datasets[0] = {...chartData.datasets[0], data: [...chartData.datasets[0].data, totalNetworkRead]}
-            chartData.datasets[1] = {...chartData.datasets[1], data: [...chartData.datasets[1].data, totalNetworkWrite]}
+            chartData.datasets[0] = {...chartData.datasets[0], data: [...chartData.datasets[0].data, diskReadUsage]}
+            chartData.datasets[1] = {...chartData.datasets[1], data: [...chartData.datasets[1].data, diskWriteUsage]}
             if (chartData.labels.length > 10) {
               chartData.labels.shift();
               chartData.datasets[0].data.shift();

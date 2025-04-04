@@ -81,14 +81,20 @@ function getCPUInfos() {
 function getDisksInfos() {
     if (cacheInfos.disksInfos) return Promise.resolve(cacheInfos.disksInfos);
     return Promise.all([si.blockDevices(), si.fsSize()]).then(([blockDevices, disks]) => {
-        console.log(blockDevices, disks)
+        console.debug("block devices", blockDevices)
+        console.debug("disks", disks)
 
         let filteredDisks = disks
             .filter(d => d.rw); //Filter non-virtual disks (for VPS) or read-only disks
 
         if (blockDevices && blockDevices.length > 0) {
-            filteredDisks = filteredDisks
-                .filter(d => blockDevices.find(b => b.mount === d.fs && b.physical !== "Network")); //Filter network disks
+            let filteredBlocks = blockDevices
+                .filter(b => b.physical !== "" && b.physical !== "Network" && b.type !== "loop" && filteredDisks.find(d => d.fs === b.device)); //Filter network disks and loop devices
+            console.log(filteredDisks, filteredBlocks)
+            if(filteredBlocks.length > 0) {
+                filteredDisks = filteredDisks
+                    .filter(d => filteredBlocks.find(b => b.device === d.fs)); //Filter network disks
+            }
         }
 
         cacheInfos.disksInfos = filteredDisks
