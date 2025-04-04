@@ -13,6 +13,9 @@ export default defineNuxtConfig({
   },
   modules: ['@primevue/nuxt-module', '@nuxt/icon'],
   primevue: {
+    components: {
+      include: ['Chart']
+    },
     options: {
       ripple: true,
       inputVariant: 'filled',

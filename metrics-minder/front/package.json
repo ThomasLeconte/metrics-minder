@@ -1,25 +1,26 @@
 {
-  "name": "metrics-minder-front",
+  "name": "nuxt-app",
   "private": true,
-  "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "vue-tsc -b && vite build",
-    "preview": "vite preview"
+    "build": "nuxt build",
+    "dev": "nuxt dev -p 5173",
+    "generate": "nuxt generate",
+    "preview": "nuxt preview",
+    "postinstall": "nuxt prepare"
   },
   "dependencies": {
+    "@nuxt/icon": "^1.11.0",
     "@primeuix/themes": "^1.0.1",
+    "@primevue/forms": "^4.3.3",
+    "@primevue/nuxt-module": "^4.3.3",
+    "@tailwindcss/vite": "^4.1.2",
+    "axios": "^1.8.4",
+    "chart.js": "^4.4.8",
+    "nuxt": "^3.16.2",
     "primevue": "^4.3.3",
-    "vue": "^3.5.13"
-  },
-  "devDependencies": {
-    "@primevue/auto-import-resolver": "^4.3.3",
-    "@vitejs/plugin-vue": "^5.2.1",
-    "@vue/tsconfig": "^0.7.0",
-    "typescript": "~5.7.2",
-    "unplugin-vue-components": "^28.4.1",
-    "vite": "^6.2.0",
-    "vue-tsc": "^2.2.4"
+    "tailwindcss": "^4.1.2",
+    "vue": "^3.5.13",
+    "vue-router": "^4.5.0"
   }
 }

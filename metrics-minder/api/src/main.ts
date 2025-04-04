@@ -3,8 +3,10 @@ import os from 'os';
 import si from "systeminformation";
 import cors from 'cors';
 import {CpuInfos, DiskInfos, MemoryInfos, NetworkInfos, OsInfos} from "./models/main-infos";
+import osu from 'node-os-utils';
 
 const app = express();
+app.use(cors());
 const port = 3000;
 
 let disksIOCompatibility = {
@@ -44,6 +46,10 @@ app.get('/api/network-infos', async (req, res) => {
 
 app.get('/api/disk-infos', async (req, res) => {
     res.json(await getDiskDetails());
+});
+
+app.get('/api/disk-capacity-infos', async (req, res) => {
+    res.json(await getDisksInfos());
 });
 
 function getOSInfos() {
@@ -139,7 +145,7 @@ function getNetworkInfos() {
 function getCPUDetails() {
     return si.currentLoad().then((load) => {
         return {
-            currentLoad: load.currentLoad,
+            currentLoad: load.cpus.reduce((acc, v) => acc + v.load, 0),
             avgLoad: load.avgLoad * 10
         }
     });
@@ -211,9 +217,8 @@ app.listen(port, async () => {
                 }
                 console.log(disksIOCompatibility)
             }).finally(() => {
-                console.log("Client disponible sur http://localhost:3000")
-                app.use(cors())
-                app.use(express.static('public'));
-            });
+            console.log("Client disponible sur http://localhost:3000")
+            app.use(express.static('public'));
+        });
     }, 1000);
 });
