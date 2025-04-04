@@ -16,7 +16,6 @@ const express_1 = __importDefault(require("express"));
 const os_1 = __importDefault(require("os"));
 const systeminformation_1 = __importDefault(require("systeminformation"));
 const cors_1 = __importDefault(require("cors"));
-const node_os_utils_1 = __importDefault(require("node-os-utils"));
 const app = (0, express_1.default)();
 app.use((0, cors_1.default)());
 const port = 3000;
@@ -137,7 +136,6 @@ function getNetworkInfos() {
     });
 }
 function getCPUDetails() {
-    node_os_utils_1.default.cpu.usage().then((usage) => console.log(usage));
     return systeminformation_1.default.currentLoad().then((load) => {
         return {
             currentLoad: load.cpus.reduce((acc, v) => acc + v.load, 0),

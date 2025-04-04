@@ -6,6 +6,7 @@
       <CpuCard class="min-w-sm" :refreshRate="refreshRateChoosen" />
       <MemoryCard class="min-w-sm" :refreshRate="refreshRateChoosen" />
       <DiskCapacityUsage class="min-w-sm" :refresh-rate="refreshRateChoosen" />
+      <NetworkUsage :refresh-rate="refreshRateChoosen" />
     </div>
   </div>
 </template>
@@ -15,10 +16,12 @@ import InfosCard from "~/pages/dashboard/components/infos-card.vue";
 import CpuCard from "~/pages/dashboard/components/cpu-card.vue";
 import MemoryCard from "~/pages/dashboard/components/memory-card.vue";
 import DiskCapacityUsage from "~/pages/dashboard/components/disk-capacity-card.vue";
+import NetworkUsage from "~/pages/dashboard/components/network-card.vue";
 
 export default defineComponent({
   name: 'Dashboard',
   components: {
+    NetworkUsage,
     DiskCapacityUsage,
     MemoryCard,
     CpuCard,
