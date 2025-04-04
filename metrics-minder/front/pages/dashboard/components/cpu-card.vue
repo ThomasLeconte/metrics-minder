@@ -1,6 +1,6 @@
 <template>
   <CustomCard :title="title">
-    <Chart type="line" :data="chartData" :options="chartOptions"  />
+    <Chart class="test" type="line" :data="chartData" :height="250" :options="chartOptions"  />
   </CustomCard>
 </template>
 <script lang="ts">
@@ -86,3 +86,12 @@ export default defineComponent({
   }
 })
 </script>
+
+<style scoped>
+.test {
+  height: 100%;
+}
+.test > canvas {
+  height: 100% !important;
+}
+</style>
