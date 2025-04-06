@@ -1,10 +1,16 @@
 import Aura from '@primeuix/themes/aura';
 import tailwindcss from "@tailwindcss/vite";
+import {SystemMetrics} from "./server/system-metrics";
 
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   compatibilityDate: '2024-11-01',
   devtools: { enabled: true },
+  hooks: {
+    ready: (ctx) => {
+        SystemMetrics.getInstance();
+    }
+  },
   css: ['~/assets/css/main.css'],
   vite: {
     plugins: [

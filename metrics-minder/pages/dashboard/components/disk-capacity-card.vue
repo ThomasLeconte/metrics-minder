@@ -1,6 +1,6 @@
 <template>
   <CustomCard :title="title">
-    <Chart type="pie" :data="chartData" :options="chartOptions" :height="150" :width="150" />
+    <Chart type="pie" :data="chartData" :options="chartOptions" :height="250" :width="150" />
   </CustomCard>
 </template>
 <script lang="ts">

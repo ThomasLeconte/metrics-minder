@@ -6,8 +6,8 @@
       <CpuCard class="min-w-sm" :refreshRate="refreshRateChoosen" />
       <MemoryCard class="min-w-sm" :refreshRate="refreshRateChoosen" />
       <DiskCapacityUsage class="min-w-sm" :refresh-rate="refreshRateChoosen" />
-      <DiskUsage class="min-w-sm" :refresh-rate="refreshRateChoosen" />
-      <NetworkUsage class="min-w-sm" :refresh-rate="refreshRateChoosen" />
+      <DiskUsage class="min-w-lg" :refresh-rate="refreshRateChoosen" />
+      <NetworkUsage class="min-w-lg" :refresh-rate="refreshRateChoosen" />
     </div>
   </div>
 </template>
