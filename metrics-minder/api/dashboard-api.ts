@@ -6,8 +6,8 @@ export class DashboardApi {
         return instance.get("/api/main-infos").then((response => response.data));
     }
 
-    static getCpuMetrics() {
-        return instance.get("/api/cpu-metrics").then((response => response.data));
+    static getCpuMetrics(multiple = false) {
+        return instance.get(`/api/cpu-metrics?multipleCpus=${multiple}`).then((response => response.data));
     }
 
     static getMemoryMetrics() {

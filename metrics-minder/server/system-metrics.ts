@@ -174,12 +174,20 @@ export class SystemMetrics {
         });
     }
 
-    getCPUDetails() {
+    getCPUDetails(multiple = false) {
         return si.currentLoad().then((load) => {
-            console.log(load.cpus.map((cpu, i) => "CPU " + i + ": " + cpu.load.toFixed(2) + '%'));
-            return {
-                currentLoad: load.cpus.reduce((acc, v) => acc + v.load, 0) / load.cpus.length,
-                avgLoad: load.avgLoad * 10
+            if(multiple) {
+                return load.cpus.map((cpu, i) => {
+                   return {
+                       currentLoad: cpu.load.toFixed(2)
+                   }
+                });
+            } else {
+                console.log(load.cpus.map((cpu, i) => "CPU " + i + ": " + cpu.load.toFixed(2) + '%'));
+                return [{
+                    currentLoad: load.cpus.reduce((acc, v) => acc + v.load, 0) / load.cpus.length,
+                    avgLoad: load.avgLoad * 10
+                }];
             }
         });
     }

@@ -3,7 +3,7 @@
     <HeaderCard class="w-full mb-20" @refreshRateUpdated="onUpdateRefreshRate" />
     <div class="flex flex-wrap gap-15">
       <InfosCard class="min-w-xl" />
-      <CpuCard class="min-w-sm" :refreshRate="refreshRateChoosen" />
+      <CpuCard class="min-w-xl" :refreshRate="refreshRateChoosen" />
       <MemoryCard class="min-w-sm" :refreshRate="refreshRateChoosen" />
       <DiskCapacityUsage class="min-w-sm" :refresh-rate="refreshRateChoosen" />
       <DiskUsage class="min-w-lg" :refresh-rate="refreshRateChoosen" />
