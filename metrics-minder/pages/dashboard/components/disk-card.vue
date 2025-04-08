@@ -6,6 +6,7 @@
 <script lang="ts">
 import CustomCard from "~/pages/dashboard/components/custom-card.vue";
 import {DashboardApi} from "~/api/dashboard-api";
+import {formatToMb} from "~/utils/format-utils";
 
 export default defineComponent({
   name: "DiskUsage",
@@ -77,9 +78,9 @@ export default defineComponent({
             const rx = diskDetails.rx_sec || (diskDetails.tx_sec && diskDetails.rx_sec ? diskDetails.tx_sec - diskDetails.rx_sec : 0);
             const wx = diskDetails.wx_sec || (diskDetails.tx_sec && diskDetails.rx_sec ? diskDetails.tx_sec - diskDetails.rx_sec : 0);
             const tx = diskDetails.tx_sec || (diskDetails.rx_sec && diskDetails.wx_sec ? diskDetails.rx_sec + diskDetails.wx_sec : 0);
-            const diskReadUsage = formatBytesToMega(rx);
-            const diskWriteUsage = formatBytesToMega(wx) || 0;
-            const diskTotalUsage = formatBytesToMega(tx) || 0;
+            const diskReadUsage = formatToMb(rx);
+            const diskWriteUsage = formatToMb(wx) || 0;
+            const diskTotalUsage = formatToMb(tx) || 0;
 
             title.value = `Disk usage (${(diskTotalUsage)} MB/s)`;
             chartData.labels.push(new Date().toLocaleTimeString());

@@ -6,6 +6,7 @@
 <script lang="ts">
 import CustomCard from "~/pages/dashboard/components/custom-card.vue";
 import {DashboardApi} from "~/api/dashboard-api";
+import {formatNetworkIO, formatToKb} from "~/utils/format-utils";
 
 export default defineComponent({
   name: "NetworkUsage",
@@ -24,13 +25,13 @@ export default defineComponent({
       labels: [] as any[],
       datasets: [
         {
-          label: 'Network Read (KB/s)',
+          label: 'Network Read (MB/s)',
           data: [] as any[],
           borderColor: 'rgba(54, 162, 235, 1)',
           fill: false,
         },
         {
-          label: 'Network Write (KB/s)',
+          label: 'Network Write (MB/s)',
           data: [] as any[],
           borderColor: 'rgba(255, 206, 86, 1)',
           fill: false,
@@ -44,7 +45,7 @@ export default defineComponent({
       scales: {
         y: {
           beginAtZero: true,
-          max: 100
+          max: 10
         }
       }})
 
@@ -74,10 +75,12 @@ export default defineComponent({
     function updateMetrics() {
       DashboardApi.getNetworksMetrics()
           .then((networkDetails: any[]) => {
-            const totalNetworkRead = networkDetails.reduce((acc, network) => acc + network.rx_sec, 0) / 1024;
-            const totalNetworkWrite = networkDetails.reduce((acc, network) => acc + network.tx_sec, 0) / 1024;
+            const totalNetworkRead = formatToKb(networkDetails.reduce((acc, network) => acc + network.rx_sec, 0));
+            const totalNetworkWrite = formatToKb(networkDetails.reduce((acc, network) => acc + network.tx_sec, 0));
 
-            title.value = `Network usage (${(totalNetworkRead + totalNetworkWrite).toFixed(2)} MB/s)`;
+            chartOptions.value.scales.y.max = Math.max(...chartData.datasets[0].data, ...chartData.datasets[1].data) + 2
+
+            title.value = `Network usage (${(totalNetworkRead + totalNetworkWrite).toFixed(2)} KB/s)`;
             chartData.labels.push(new Date().toLocaleTimeString());
             chartData.datasets[0] = {...chartData.datasets[0], data: [...chartData.datasets[0].data, totalNetworkRead]}
             chartData.datasets[1] = {...chartData.datasets[1], data: [...chartData.datasets[1].data, totalNetworkWrite]}

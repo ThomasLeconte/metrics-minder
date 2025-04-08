@@ -71,8 +71,6 @@ export default defineComponent({
     function updateMetrics() {
       DashboardApi.getCpuMetrics(multiple.value)
        .then((response: any[]) => {
-         console.log(response);
-
          if(chartData.datasets.length === 0 || chartData.datasets.length !== response.length) {
            chartData.datasets = response.map((cpu, index) => {
              const randomColor = `rgba(${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, 1)`;

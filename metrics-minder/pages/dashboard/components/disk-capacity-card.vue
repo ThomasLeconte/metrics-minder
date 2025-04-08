@@ -6,6 +6,7 @@
 <script lang="ts">
 import CustomCard from "~/pages/dashboard/components/custom-card.vue";
 import {DashboardApi} from "~/api/dashboard-api";
+import {formatDisk, formatToGb} from "~/utils/format-utils";
 
 export default defineComponent({
   name: "DiskCapacityUsage",
@@ -21,7 +22,7 @@ export default defineComponent({
     const title = ref('Disk capacity');
 
     const chartData = reactive({
-      labels: [] as any[],
+      labels: ["Used", "Free"],
       datasets: [{
         data: [0, 100],
         backgroundColor: ['rgba(255, 99, 132, 0.2)', 'rgba(54, 162, 235, 0.2)'],
@@ -38,7 +39,7 @@ export default defineComponent({
           callbacks: {
             label: function(tooltipItem: any) {
               const value = tooltipItem.raw;
-              return `${tooltipItem.label}: ${formatBytesToGiga(value)} GB`;
+              return `${tooltipItem.label}: ${formatDisk(value)}`;
             }
           }
         },
