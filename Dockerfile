@@ -1,8 +1,11 @@
-# Utiliser une image de base officielle Node.js
 FROM node:18-alpine
 
-# Définir le répertoire de travail dans le conteneur
-WORKDIR /usr/src/app
+################
+### FRONTEND ###
+################
+
+# Set the working directory
+WORKDIR /usr/src/app/front
 
 # Copier le fichier package.json et package-lock.json
 COPY package*.json ./
@@ -11,10 +14,17 @@ COPY package*.json ./
 RUN npm install
 
 # Copier le reste du code source de l'application
-COPY . .
+COPY .. .
 
-# Exposer le port sur lequel l'application va tourner
-EXPOSE 3000
+# Définir variable d'environnement pour le port
+ENV NITRO_PORT=5173
+
+# Build
+RUN npm run build
+
+#############################
+### START THE APPLICATION ###
+#############################
 
 # Commande pour démarrer l'application
-CMD ["node", "src/index.js"]
+CMD ["node", ".output/server/index.mjs"]
