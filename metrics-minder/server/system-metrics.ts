@@ -25,6 +25,7 @@ export class SystemMetrics {
             disksInfos: null,
             networkInfos: null
         };
+        this.getMainInfos();
     }
 
     private checkCompatibility() {
@@ -91,33 +92,46 @@ export class SystemMetrics {
     }
 
     getDisksInfos() {
-        if (this.cacheInfos.disksInfos) return Promise.resolve(this.cacheInfos.disksInfos);
-        return Promise.all([si.blockDevices(), si.fsSize()]).then(([blockDevices, disks]) => {
-            console.debug("block devices", blockDevices)
-            console.debug("disks", disks)
+        if (this.cacheInfos.disksInfos) {
+            return Promise.resolve(this.cacheInfos.disksInfos);
+        }
+        return Promise.all([si.blockDevices(), si.fsSize(), si.diskLayout()]).then(([blockDevices, disks, disksLayout]) => {
+            // console.log("coucou")
+            // console.log("block devices", blockDevices)
+            // console.log("disks", disks)
+            // console.log("layout", disksLayout);
 
             let filteredDisks = disks
                 .filter(d => d.rw); //Filter non-virtual disks (for VPS) or read-only disks
 
-            if (blockDevices && blockDevices.length > 0) {
-                let filteredBlocks = blockDevices
-                    .filter(b => b.physical !== "" && b.physical !== "Network" && b.type !== "loop" && filteredDisks.find(d => d.fs === b.device)); //Filter network disks and loop devices
-                console.log(filteredDisks, filteredBlocks)
-                if(filteredBlocks.length > 0) {
-                    filteredDisks = filteredDisks
-                        .filter(d => filteredBlocks.find(b => b.device === d.fs)); //Filter network disks
-                }
+            let result = [] as any[];
+
+            if(disksLayout && disksLayout.length > 0) {
+                disksLayout.forEach(diskLayout => {
+                    if(blockDevices && blockDevices.length > 0) {
+                        let filteredBlockDevices = blockDevices
+                            .filter(b => b.device && b.device === diskLayout.device)
+                            .filter(b => b.physical !== "" && b.physical !== "Network" && b.type !== "loop");
+                        if(filteredBlockDevices.length > 0) {
+                            let _filteredDisks = filteredDisks
+                                .filter(d => filteredBlockDevices.find(b => b.name === d.fs || b.mount === d.fs || b.name === d.mount || b.mount === d.mount))
+
+                            if(_filteredDisks.length > 0) {
+                                result.push(..._filteredDisks.map(d => {
+                                    return {
+                                        fs: d.fs,
+                                        size: d.size,
+                                        used: d.used,
+                                        available: d.available
+                                    }
+                                }))
+                            }
+                        }
+                    }
+                })
             }
 
-            this.cacheInfos.disksInfos = filteredDisks
-                .map((disk) => {
-                    return {
-                        fs: disk.fs,
-                        size: disk.size,
-                        used: disk.used,
-                        available: disk.available
-                    }
-                });
+            this.cacheInfos.disksInfos = result;
 
             return this.cacheInfos.disksInfos;
         });
@@ -162,8 +176,9 @@ export class SystemMetrics {
 
     getCPUDetails() {
         return si.currentLoad().then((load) => {
+            console.log(load.cpus.map((cpu, i) => "CPU " + i + ": " + cpu.load.toFixed(2) + '%'));
             return {
-                currentLoad: load.cpus.reduce((acc, v) => acc + v.load, 0),
+                currentLoad: load.cpus.reduce((acc, v) => acc + v.load, 0) / load.cpus.length,
                 avgLoad: load.avgLoad * 10
             }
         });
