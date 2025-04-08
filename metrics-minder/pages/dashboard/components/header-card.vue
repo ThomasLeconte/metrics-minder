@@ -4,10 +4,14 @@
       <div class="flex justify-between items-start">
         <div class="flex justify-content-between align-items-center gap-5">
           <h2>Metrics minder</h2>
-          <Icon name="uil:github" style="color: black" size="2rem" />
+          <Icon name="uil:github" :style="[dark ? 'white' : 'black']" size="2rem" />
           <Select v-model="refreshRate" :options="refreshOptions" optionLabel="name" optionValue="value" placeholder="Select refresh rate" size="small" />
         </div>
-        <div>
+        <div class="flex items-center gap-10">
+          <div class="flex items-center gap-2">
+            <span>Dark</span>
+            <ToggleSwitch v-model="dark" />
+          </div>
           <p class="text-lg">Made with ❤️ by <a href="https://github.com/ThomasLeconte" target="_blank" class="text-blue-500 hover:underline">Thomas LECONTE</a></p>
         </div>
       </div>
@@ -27,6 +31,14 @@ export default defineComponent({
   watch: {
     refreshRate(newValue) {
       this.$emit('refreshRateUpdated', newValue)
+    },
+    dark(newValue) {
+      if(newValue) {
+        document.documentElement.classList.toggle('dark-mode', true)
+        this.$forceUpdate();
+      } else {
+        document.documentElement.classList.toggle('dark-mode', false)
+      }
     }
   },
   data() {
@@ -37,7 +49,8 @@ export default defineComponent({
         { name: '2 seconds', value: 2000 },
         { name: '5 seconds', value: 5000 },
         { name: '10 seconds', value: 10000 }
-      ]
+      ],
+      dark: false
     }
   }
 })

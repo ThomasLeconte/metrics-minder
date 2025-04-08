@@ -30,7 +30,6 @@ export default defineComponent({
       }]
     })
     const chartOptions = ref({
-      animation: false,
       responsive: true,
       maintainAspectRatio: false,
       scales: {

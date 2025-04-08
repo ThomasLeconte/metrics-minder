@@ -38,7 +38,7 @@ export default defineComponent({
 
     function formatMainInfos() {
       if(!mainInfos.value) return;
-      caracteristics.value.push({title: "OS", value: `${mainInfos.value.os.distro || ''} ${mainInfos.value.os.release} ${mainInfos.value.os.platform} ${mainInfos.value.os.arch}`});
+      caracteristics.value.push({title: "OS", value: `${mainInfos.value.os?.distro || ''} ${mainInfos.value.os?.release} ${mainInfos.value.os?.platform} ${mainInfos.value.os?.arch}`});
       caracteristics.value.push({title: "CPU", value: `${mainInfos.value.cpu.manufacturer} ${mainInfos.value.cpu.brand} ${mainInfos.value.cpu.speed} GHz`});
       const totalMemory = mainInfos.value.memory.reduce((acc, curr) => acc + curr.size, 0);
       const totalDisks = mainInfos.value.disks.reduce((acc, curr) => acc + curr.size, 0);

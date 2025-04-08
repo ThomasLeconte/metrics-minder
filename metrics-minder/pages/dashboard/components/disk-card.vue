@@ -82,7 +82,7 @@ export default defineComponent({
             const diskWriteUsage = formatToMb(wx) || 0;
             const diskTotalUsage = formatToMb(tx) || 0;
 
-            title.value = `Disk usage (${(diskTotalUsage)} MB/s)`;
+            title.value = `Disk usage (${diskTotalUsage.toFixed(2)} MB/s)`;
             chartData.labels.push(new Date().toLocaleTimeString());
             chartData.datasets[0] = {...chartData.datasets[0], data: [...chartData.datasets[0].data, diskReadUsage]}
             chartData.datasets[1] = {...chartData.datasets[1], data: [...chartData.datasets[1].data, diskWriteUsage]}

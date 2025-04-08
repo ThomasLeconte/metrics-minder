@@ -1,8 +1,8 @@
 <template>
   <div class="p-10">
-    <HeaderCard class="w-full mb-20" @refreshRateUpdated="onUpdateRefreshRate" />
+    <HeaderCard class="w-full mb-20 animate__animated animate__bounce" @refreshRateUpdated="onUpdateRefreshRate" />
     <div class="flex flex-wrap gap-15">
-      <InfosCard class="min-w-xl" />
+      <InfosCard class="min-w-sm" />
       <CpuCard class="min-w-xl" :refreshRate="refreshRateChoosen" />
       <MemoryCard class="min-w-sm" :refreshRate="refreshRateChoosen" />
       <DiskCapacityUsage class="min-w-sm" :refresh-rate="refreshRateChoosen" />

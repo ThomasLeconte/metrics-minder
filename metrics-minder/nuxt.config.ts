@@ -11,7 +11,7 @@ export default defineNuxtConfig({
         SystemMetrics.getInstance();
     }
   },
-  css: ['~/assets/css/main.css'],
+  css: ['~/assets/css/main.css', 'animate.css/animate.min.css'],
   vite: {
     plugins: [
       tailwindcss(),
@@ -29,7 +29,7 @@ export default defineNuxtConfig({
         preset: Aura,
         options: {
           prefix: 'p',
-          darkModeSelector: '.dark-modes',
+          darkModeSelector: '.dark-mode',
           cssLayer: false
         }
       }

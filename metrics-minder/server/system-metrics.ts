@@ -113,6 +113,10 @@ export class SystemMetrics {
                             .filter(b => b.device && b.device === diskLayout.device)
                             .filter(b => b.physical !== "" && b.physical !== "Network" && b.type !== "loop");
                         if(filteredBlockDevices.length > 0) {
+                            console.log("filteredBlockDevices", filteredBlockDevices)
+                            console.log("filteredDisks", filteredDisks)
+                            console.log("diskLayout", diskLayout)
+
                             let _filteredDisks = filteredDisks
                                 .filter(d => filteredBlockDevices.find(b => b.name === d.fs || b.mount === d.fs || b.name === d.mount || b.mount === d.mount))
 
@@ -125,6 +129,15 @@ export class SystemMetrics {
                                         available: d.available
                                     }
                                 }))
+                            } else {
+                                result.push(...filteredDisks.map(d => {
+                                    return {
+                                        fs: d.fs,
+                                        size: d.size,
+                                        used: d.used,
+                                        available: d.available
+                                    }
+                                }));
                             }
                         }
                     }
@@ -183,7 +196,7 @@ export class SystemMetrics {
                    }
                 });
             } else {
-                console.log(load.cpus.map((cpu, i) => "CPU " + i + ": " + cpu.load.toFixed(2) + '%'));
+                // console.log(load.cpus.map((cpu, i) => "CPU " + i + ": " + cpu.load.toFixed(2) + '%'));
                 return [{
                     currentLoad: load.cpus.reduce((acc, v) => acc + v.load, 0) / load.cpus.length,
                     avgLoad: load.avgLoad * 10
