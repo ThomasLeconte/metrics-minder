@@ -89,6 +89,9 @@ export default defineComponent({
               chartData.datasets[0].data.shift();
               chartData.datasets[1].data.shift();
             }
+
+            //update y axe
+            chartOptions.value.scales.y.max = Math.max(...chartData.datasets[0].data, ...chartData.datasets[1].data) + 2
           });
     }
 
