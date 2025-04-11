@@ -1,7 +1,7 @@
 <template>
-  <div class="p-10">
-    <HeaderCard class="w-full mb-20 animate__animated animate__bounce" @refreshRateUpdated="onUpdateRefreshRate" />
-    <div class="flex flex-wrap gap-15 animate__animated animate__fadeInUp">
+  <div class="p-8">
+    <HeaderCard class="w-full mb-8 animate__animated animate__bounce" @refreshRateUpdated="onUpdateRefreshRate" />
+    <div class="flex flex-wrap justify-center items-center gap-x-12 gap-y-6 animate__animated animate__fadeInUp">
       <InfosCard class="w-full xl:w-xl 2xl:w-xl animate__animated animate__fadeInUp" />
       <CpuCard class="w-full xl:w-xl 2xl:w-xl animate__animated animate__fadeInUp" :refreshRate="refreshRateChoosen" />
       <MemoryCard class="w-full xl:w-lg 2xl:w-sm animate__animated animate__fadeInUp" :refreshRate="refreshRateChoosen" />
