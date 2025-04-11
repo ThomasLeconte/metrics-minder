@@ -10,14 +10,16 @@
             </a>
           </div>
 
-          <Select class="w-full" v-model="refreshRate" :options="refreshOptions" optionLabel="name" optionValue="value" placeholder="Select refresh rate" size="small" />
+          <Select class="w-full" v-model="refreshRate" :options="refreshOptions" optionLabel="name" optionValue="value"
+            placeholder="Select refresh rate" size="small" />
 
           <div class="flex items-center gap-2">
             <span>Dark</span>
             <ToggleSwitch v-model="dark" />
           </div>
 
-          <p class="text-lg text-center">Made with ❤️ by <a href="https://github.com/ThomasLeconte" target="_blank" class="text-blue-500 hover:underline">Thomas LECONTE</a></p>
+          <p class="text-lg text-center">Made with ❤️ by <a href="https://github.com/ThomasLeconte" target="_blank"
+              class="text-blue-500 hover:underline">Thomas LECONTE</a></p>
         </div>
       </template>
       <div v-else class="flex justify-between items-start">
@@ -26,14 +28,16 @@
           <a href="https://github.com/ThomasLeconte/metrics-minder">
             <Icon name="uil:github" :style="[dark ? 'white' : 'black']" size="2rem" />
           </a>
-          <Select v-model="refreshRate" :options="refreshOptions" optionLabel="name" optionValue="value" placeholder="Select refresh rate" size="small" />
+          <Select v-model="refreshRate" :options="refreshOptions" optionLabel="name" optionValue="value"
+            placeholder="Select refresh rate" size="small" />
         </div>
         <div class="flex items-center gap-10">
           <div class="flex items-center gap-2">
             <span>Dark</span>
             <ToggleSwitch v-model="dark" />
           </div>
-          <p class="text-lg">Made with ❤️ by <a href="https://github.com/ThomasLeconte" target="_blank" class="text-blue-500 hover:underline">Thomas LECONTE</a></p>
+          <p class="text-lg">Made with ❤️ by <a href="https://github.com/ThomasLeconte" target="_blank"
+              class="text-blue-500 hover:underline">Thomas LECONTE</a></p>
         </div>
       </div>
     </template>
@@ -41,7 +45,7 @@
 </template>
 
 <script lang="ts">
-import {defineComponent} from "vue";
+import { defineComponent } from "vue";
 import CustomCard from "~/pages/components/custom-card.vue";
 
 export default defineComponent({
@@ -54,11 +58,13 @@ export default defineComponent({
       this.$emit('refreshRateUpdated', newValue)
     },
     dark(newValue) {
-      if(newValue) {
+      if (newValue) {
         document.documentElement.classList.toggle('dark-mode', true)
+        localStorage.setItem('dark-mode', JSON.stringify(newValue))
         this.$forceUpdate();
       } else {
         document.documentElement.classList.toggle('dark-mode', false)
+        localStorage.setItem('dark-mode', JSON.stringify(null))
       }
     }
   },
@@ -77,9 +83,14 @@ export default defineComponent({
   },
   mounted() {
     this.isMobile = document.documentElement.clientWidth < 768
+
+    const savedDark = localStorage.getItem('dark-mode')
+    if (savedDark !== null) {
+      this.dark = JSON.parse(savedDark)
+      document.documentElement.classList.toggle('dark-mode', this.dark)
+    }
   }
 })
 </script>
 
-<style scoped>
-</style>
+<style scoped></style>
