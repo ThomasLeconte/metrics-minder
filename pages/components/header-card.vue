@@ -60,11 +60,11 @@ export default defineComponent({
     dark(newValue) {
       if (newValue) {
         document.documentElement.classList.toggle('dark-mode', true)
-        localStorage.setItem('dark-mode', JSON.stringify(newValue))
+        localStorage.setItem('dark-mode', true)
         this.$forceUpdate();
       } else {
         document.documentElement.classList.toggle('dark-mode', false)
-        localStorage.setItem('dark-mode', JSON.stringify(null))
+        localStorage.setItem('dark-mode', false)
       }
     }
   },
@@ -86,7 +86,7 @@ export default defineComponent({
 
     const savedDark = localStorage.getItem('dark-mode')
     if (savedDark !== null) {
-      this.dark = JSON.parse(savedDark)
+      this.dark = savedDark === 'true';
       document.documentElement.classList.toggle('dark-mode', this.dark)
     }
   }
